@@ -15,12 +15,12 @@ namespace LuaconvertTest
             using (Lua lua = new Lua())
             {
                 lua.DoFile("example.lua");
-                var sourceSettingsTable = (LuaTable)lua["SourceCalibrationSettings"];
-                foreach (var item in sourceSettingsTable.Keys)
+                var receiverSettingsTable = (LuaTable)lua["ReceiverCalibrationSettings"];
+                foreach (var item in receiverSettingsTable.Keys)
                 {
-                    var overrideSourceSweep = new OverrideSourceSweepSetting();
-                    if (item.ToString() == "source_full_frequency_range")
-                        overrideSourceSweep.FromLuaTable(sourceSettingsTable, item.ToString());
+                    var overrideReceiverSweep = new OverrideReceiverSweepSetting();
+                    if (item.ToString() == "sweep_receiver_NI5531_and_NI5534RX")
+                        overrideReceiverSweep.FromLuaTable(receiverSettingsTable, item.ToString());
                 }
             }
         }
