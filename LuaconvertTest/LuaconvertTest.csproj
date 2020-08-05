@@ -51,7 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Receiver.cs" />
+    <Compile Include="Source.cs" />
+    <Compile Include="general.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
