@@ -71,11 +71,11 @@ namespace LuaconvertTest
                 foreach (var item in point.Keys)
                 {
                     if (item.ToString() == "portPower")
-                        vectorSweepSettingPoint.PortPower = General.MutiDoubleFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.PortPower = Utilities.MutiDoubleFromFile(point, item.ToString());
                     else if (item.ToString() == "freq")
                         vectorSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
                     else if (item.ToString() == "referenceLevel")
-                        vectorSweepSettingPoint.ReferenceLevel = General.MutiDoubleFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.ReferenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
                     else if (item.ToString() == "IFBW")
                         vectorSweepSettingPoint.IFBW = double.Parse(point[item].ToString());
                     else if (item.ToString() == "calibrationSettings")
@@ -86,19 +86,19 @@ namespace LuaconvertTest
                             if (subpoint.ToString() == "IFBW")
                                 vectorSweepSettingPoint.calibrationSettings.IFBW = double.Parse(calibrationTable[subpoint].ToString());
                             else if (subpoint.ToString() == "vectorCal_Power")
-                                vectorSweepSettingPoint.calibrationSettings.vectorCal_Power = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
+                                vectorSweepSettingPoint.calibrationSettings.vectorCal_Power = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
                             else if (subpoint.ToString() == "vectorCal_Power_powerMeter")
-                                vectorSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
+                                vectorSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
                             else if (subpoint.ToString() == "scalarCal_Power_sourceCal")
-                                vectorSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
+                                vectorSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
                         }
                     }
                     else if (item.ToString() == "RFSAReferenceLevel")
-                        vectorSweepSettingPoint.RFSARerenceLevel = General.MutiDoubleFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.RFSARerenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
                     else if (item.ToString() == "5530_TXPath")
-                        vectorSweepSettingPoint.TXPath_5530 = General.MutiStringFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.TXPath_5530 = Utilities.MutiStringFromFile(point, item.ToString());
                     else if (item.ToString() == "5530_RXPath")
-                        vectorSweepSettingPoint.RXPath_5530 = General.MutiStringFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.RXPath_5530 = Utilities.MutiStringFromFile(point, item.ToString());
                 }
                 VectorSweepSettingPoints.Add(vectorSweepSettingPoint);
                 lastVectorSweepSettingPoint = vectorSweepSettingPoint;
@@ -136,11 +136,11 @@ namespace LuaconvertTest
                 foreach (var item in point.Keys)
                 {
                     if (item.ToString() == "portPower")
-                        vectorSweepSettingPoint.PortPower = General.MutiDoubleFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.PortPower = Utilities.MutiDoubleFromFile(point, item.ToString());
                     if (item.ToString() == "freq")
                         vectorSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
                     if (item.ToString() == "ReferenceLevel")
-                        vectorSweepSettingPoint.ReferenceLevel = General.MutiDoubleFromFile(point, item.ToString());
+                        vectorSweepSettingPoint.ReferenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
                     if (item.ToString() == "IFBW")
                         vectorSweepSettingPoint.IFBW = double.Parse(point[item].ToString());
                 }

@@ -1,5 +1,6 @@
 ﻿using NLua;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -8,6 +9,7 @@ namespace LuaconvertTest
     /*
      * 测试函数
      */
+
     class Program
     {
         static void Main(string[] args)
@@ -23,6 +25,7 @@ namespace LuaconvertTest
                         overrideReceiverSweep.FromLuaTable(receiverSettingsTable, item.ToString());
                 }
             }
+
         }
     }
 }

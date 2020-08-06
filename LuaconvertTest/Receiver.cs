@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NLua;
 
 namespace LuaconvertTest
@@ -8,12 +9,18 @@ namespace LuaconvertTest
      * 这个类是Source模式下的calibrationSettings的数据结构.
      * 对于可能会是向量类型的变量这里用列表来表示。
      */
+    [Serializable]
     public class ReceiverCalibrationElements
     {
         public double IFBW { get; set; }
         public List<double> vectorCal_Power_powerMeter { get; set; } = new List<double>();
         public List<double> vectorCal_Power { get; set; } = new List<double>();
         public List<double> scalarCal_Power_receiverCal { get; set; } = new List<double>();
+
+        public ReceiverCalibrationElements Clone()
+        {
+            return this.MemberwiseClone() as ReceiverCalibrationElements;
+        }
     }
     /*
      * 这个类是Source模式下的simple里一个频率点的数据结构。
@@ -48,98 +55,90 @@ namespace LuaconvertTest
     {
         public string Name { get; set; }
         public List<ReceiverSweepSimplePoint> ReceiverSweepSettingPoints { get; set; } = new List<ReceiverSweepSimplePoint>();
+
         public virtual void FromLuaTable(LuaTable luaTable, string name)
         {
             Name = name;
-            var subReceiverSettingsTable = (LuaTable)luaTable[Name + ".list"];
+            var subReceiverSettingsTable = (LuaTable)luaTable[Name + ".list"];                    
             var lastReceiverSweepSettingPoint = new ReceiverSweepSimplePoint();
             int i = 0;
             foreach (LuaTable point in subReceiverSettingsTable.Values)
             {
-                var receiverSweepSettingPoint = new ReceiverSweepSimplePoint();
-                if (i > 0)
+                var receiverSweepSettingPoint = new ReceiverSweepSimplePoint
                 {
-                    receiverSweepSettingPoint.Frequency = lastReceiverSweepSettingPoint.Frequency;
-                    receiverSweepSettingPoint.ReferenceLevel = lastReceiverSweepSettingPoint.ReferenceLevel;
-                }
-                foreach (var item in point.Keys)
-                {
-                    if (item.ToString() == "freq")
-                        receiverSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
-                    if (item.ToString() == "referenceLevel")
-                        receiverSweepSettingPoint.ReferenceLevel = General.MutiDoubleFromFile(point, item.ToString());
-                }
+               
+                    Frequency = Utilities.HasField(point, "freq") ? double.Parse(point["freq"].ToString()) :
+                                                            i > 0 ? lastReceiverSweepSettingPoint.Frequency :
+                                                            default,
+                    ReferenceLevel = Utilities.HasField(point, "referenceLevel") ? Utilities.MutiDoubleFromFile(point, "referenceLevel") :
+                                                                           i > 0 ? lastReceiverSweepSettingPoint.ReferenceLevel :
+                                                                           default
+                };
+
                 ReceiverSweepSettingPoints.Add(receiverSweepSettingPoint);
                 lastReceiverSweepSettingPoint = receiverSweepSettingPoint;
                 i++;
             }
         }
+
     }
     class OverrideReceiverSweepSetting : SimpleReceiverSweepSetting
     {
-        public new string Name { get; set; }
-        public new List<ReceiverSweepOverridePoint> ReceiverSweepSettingPoints { get; set; } = new List<ReceiverSweepOverridePoint>();
+        public new List<ReceiverSweepOverridePoint> ReceiverSweepSettingPoints { get; set; }
         public override void FromLuaTable(LuaTable luaTable, string name)
         {
-            Name = name;
+            base.FromLuaTable(luaTable, name);
+            ReceiverSweepSettingPoints = (from p in base.ReceiverSweepSettingPoints
+                                         select new ReceiverSweepOverridePoint
+                                         {
+                                             Frequency = p.Frequency,
+                                             ReferenceLevel = p.ReferenceLevel,
+                                         })
+                                         .ToList();
+
             var subReceiverSettingsTable = (LuaTable)luaTable[Name + ".list"];
             var lastReceiverSweepSettingPoint = new ReceiverSweepOverridePoint();
             int i = 0;
             foreach (LuaTable point in subReceiverSettingsTable.Values)
             {
-                var receiverSweepSettingPoint = new ReceiverSweepOverridePoint();
-                if (i > 0)
-                {
-                    receiverSweepSettingPoint.Frequency = lastReceiverSweepSettingPoint.Frequency;
-                    receiverSweepSettingPoint.ReferenceLevel = lastReceiverSweepSettingPoint.ReferenceLevel;
-                    receiverSweepSettingPoint.RFSARerenceLevel = lastReceiverSweepSettingPoint.RFSARerenceLevel;
-                    receiverSweepSettingPoint.PortPower = lastReceiverSweepSettingPoint.PortPower;
-                    receiverSweepSettingPoint.ComplingPath_5530 = lastReceiverSweepSettingPoint.ComplingPath_5530;
-                    receiverSweepSettingPoint.RXPath_5530 = lastReceiverSweepSettingPoint.RXPath_5530;
-                    receiverSweepSettingPoint.TXPath_5530 = lastReceiverSweepSettingPoint.TXPath_5530;
-                    receiverSweepSettingPoint.calibrationSettings.IFBW = lastReceiverSweepSettingPoint.calibrationSettings.IFBW;
-                    receiverSweepSettingPoint.calibrationSettings.scalarCal_Power_receiverCal = lastReceiverSweepSettingPoint.calibrationSettings.scalarCal_Power_receiverCal;
-                    receiverSweepSettingPoint.calibrationSettings.vectorCal_Power = lastReceiverSweepSettingPoint.calibrationSettings.vectorCal_Power;
-                    receiverSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = lastReceiverSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter;
-                }
-                foreach (var item in point.Keys)
-                {
-                    if (item.ToString() == "freq")
-                        receiverSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
-                    else if (item.ToString() == "referenceLevel")
-                        receiverSweepSettingPoint.ReferenceLevel = General.MutiDoubleFromFile(point, item.ToString());
-                    else if (item.ToString() == "RFSAReferenceLevel")
-                        receiverSweepSettingPoint.RFSARerenceLevel = General.MutiDoubleFromFile(point, item.ToString());
-                    else if (item.ToString() == "portPower")
-                        receiverSweepSettingPoint.PortPower = General.MutiDoubleFromFile(point, item.ToString());
-                    else if (item.ToString() == "5530_CouplingPath")
-                        receiverSweepSettingPoint.ComplingPath_5530 = General.MutiStringFromFile(point, item.ToString());
-                    else if (item.ToString() == "5530_RXPath")
-                        receiverSweepSettingPoint.RXPath_5530 = General.MutiStringFromFile(point, item.ToString());
-                    else if (item.ToString() == "5530_TXPath")
-                        receiverSweepSettingPoint.TXPath_5530 = General.MutiStringFromFile(point, item.ToString());
-                    else if (item.ToString() == "calibrationSettings")
-                    {
-                        LuaTable calibrationTable = (LuaTable)point["calibrationSettings"];
-                        foreach (var subpoint in calibrationTable.Keys)
-                        {
-                            if (subpoint.ToString() == "IFBW")
-                                receiverSweepSettingPoint.calibrationSettings.IFBW = double.Parse(calibrationTable[subpoint].ToString());
-                            else if (subpoint.ToString() == "vectorCal_Power")
-                                receiverSweepSettingPoint.calibrationSettings.vectorCal_Power = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
-                            else if (subpoint.ToString() == "vectorCal_Power_powerMeter")
-                                receiverSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter= General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
-                            else if (subpoint.ToString() == "scalarCal_Power_receiverCal")
-                                receiverSweepSettingPoint.calibrationSettings.scalarCal_Power_receiverCal= General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
-                        }
-                    }
+                var receiverSweepSettingPoint = ReceiverSweepSettingPoints[i];
 
-                }
-                ReceiverSweepSettingPoints.Add(receiverSweepSettingPoint);
+                receiverSweepSettingPoint.RFSARerenceLevel = Utilities.HasField(point, "RFSAReferenceLevel") ? Utilities.MutiDoubleFromFile(point, "RFSAReferenceLevel") :
+                                                                                                           i > 0 ? lastReceiverSweepSettingPoint.RFSARerenceLevel :
+                                                                                                           default;
+                receiverSweepSettingPoint.PortPower = Utilities.HasField(point, "portPower") ? Utilities.MutiDoubleFromFile(point, "portPower") :
+                                                                                               i > 0 ? lastReceiverSweepSettingPoint.PortPower 
+                                                                                               : default;
+                receiverSweepSettingPoint.ComplingPath_5530 = Utilities.HasField(point, "5530_CouplingPath") ? Utilities.MutiStringFromFile(point, "5530_CouplingPath") :
+                                                                                                       i > 0 ? lastReceiverSweepSettingPoint.ComplingPath_5530 : 
+                                                                                                       default;
+                receiverSweepSettingPoint.RXPath_5530 = Utilities.HasField(point, "5530_RXPath") ? Utilities.MutiStringFromFile(point, "5530_RXPath") :
+                                                                                           i > 0 ? lastReceiverSweepSettingPoint.RXPath_5530 :
+                                                                                           default;
+                receiverSweepSettingPoint.TXPath_5530 = Utilities.HasField(point, "5530_TXPath") ? Utilities.MutiStringFromFile(point, "5530_TXPath") :
+                                                                                           i > 0 ? lastReceiverSweepSettingPoint.TXPath_5530 :
+                                                                                           default;
+                receiverSweepSettingPoint.calibrationSettings = Utilities.HasField(point, "calibrationSettings") ? GetCalibrationSettings((LuaTable)point["calibrationSettings"]) :
+                                                                                           i > 0 ? lastReceiverSweepSettingPoint.calibrationSettings.Clone() : 
+                                                                                           default;
+                
                 lastReceiverSweepSettingPoint = receiverSweepSettingPoint;
                 i++;
             }
 
+
+        }
+        private ReceiverCalibrationElements GetCalibrationSettings(LuaTable luaTable)
+        {
+            return new ReceiverCalibrationElements()
+            {
+                IFBW = Utilities.HasField(luaTable, "IFBW") ? double.Parse(luaTable["IFBW"].ToString()) : default,
+                vectorCal_Power = Utilities.HasField(luaTable, "vectorCal_Power") ? Utilities.MutiDoubleFromFile(luaTable, "vectorCal_Power") : default,
+                vectorCal_Power_powerMeter = Utilities.HasField(luaTable, "vectorCal_Power_powerMeter") ? Utilities.MutiDoubleFromFile(luaTable, "vectorCal_Power_powerMeter") : default,
+                scalarCal_Power_receiverCal = Utilities.HasField(luaTable, "scalarCal_Power_receiverCal") ? Utilities.MutiDoubleFromFile(luaTable, "scalarCal_Power_receiverCal") : default,
+            };
         }
     }
+
+
 }

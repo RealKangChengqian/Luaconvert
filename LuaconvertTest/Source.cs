@@ -64,7 +64,7 @@ namespace LuaconvertTest
                 foreach (var item in point.Keys)
                 {
                     if (item.ToString() == "portPower")
-                        sourceSweepSettingPoint.PortPower = General.MutiDoubleFromFile(point, item.ToString());
+                        sourceSweepSettingPoint.PortPower = Utilities.MutiDoubleFromFile(point, item.ToString());
                     if (item.ToString() == "freq")
                         sourceSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
                 }
@@ -104,11 +104,11 @@ namespace LuaconvertTest
                 foreach (var item in point.Keys)
                 {
                     if (item.ToString() == "portPower")
-                        sourceSweepSettingPoint.PortPower = General.MutiDoubleFromFile(point, item.ToString());
+                        sourceSweepSettingPoint.PortPower = Utilities.MutiDoubleFromFile(point, item.ToString());
                     else if (item.ToString() == "freq")
                         sourceSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
                     else if (item.ToString() == "referenceLevel")
-                        sourceSweepSettingPoint.ReferenceLevel = General.MutiDoubleFromFile(point, item.ToString());
+                        sourceSweepSettingPoint.ReferenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
                     else if (item.ToString() == "calibrationSettings")
                     {
                         LuaTable calibrationTable = (LuaTable)point["calibrationSettings"];
@@ -117,19 +117,19 @@ namespace LuaconvertTest
                             if (subpoint.ToString() == "IFBW")
                                 sourceSweepSettingPoint.calibrationSettings.IFBW = double.Parse(calibrationTable[subpoint].ToString());
                             else if (subpoint.ToString() == "vectorCal_Power")
-                                sourceSweepSettingPoint.calibrationSettings.vectorCal_Power = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
+                                sourceSweepSettingPoint.calibrationSettings.vectorCal_Power = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
                             else if (subpoint.ToString() == "vectorCal_Power_powerMeter")
-                                sourceSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
+                                sourceSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
                             else if (subpoint.ToString() == "scalarCal_Power_sourceCal")
-                                sourceSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal = General.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
+                                sourceSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
                         }
                     }
                     else if (item.ToString() == "RFSAReferenceLevel")
-                        sourceSweepSettingPoint.RFSARerenceLevel = General.MutiDoubleFromFile(point, item.ToString());
+                        sourceSweepSettingPoint.RFSARerenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
                     else if (item.ToString() == "5530_TXPath")
-                        sourceSweepSettingPoint.TXPath_5530 = General.MutiStringFromFile(point, item.ToString());
+                        sourceSweepSettingPoint.TXPath_5530 = Utilities.MutiStringFromFile(point, item.ToString());
                     else if (item.ToString() == "5530_RXPath")
-                        sourceSweepSettingPoint.RXPath_5530 = General.MutiStringFromFile(point, item.ToString());
+                        sourceSweepSettingPoint.RXPath_5530 = Utilities.MutiStringFromFile(point, item.ToString());
                 }
                 SourceSweepSettingPoints.Add(sourceSweepSettingPoint);
                 lastSourceSweepSettingPoint = sourceSweepSettingPoint;
