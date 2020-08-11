@@ -17,12 +17,12 @@ namespace LuaconvertTest
             using (Lua lua = new Lua())
             {
                 lua.DoFile("example.lua");
-                var receiverSettingsTable = (LuaTable)lua["ReceiverCalibrationSettings"];
-                foreach (var item in receiverSettingsTable.Keys)
+                var vectorSettingsTable = (LuaTable)lua["VectorSweepSettings"];
+                foreach (var item in vectorSettingsTable.Keys)
                 {
-                    var overrideReceiverSweep = new OverrideReceiverSweepSetting();
-                    if (item.ToString() == "sweep_receiver_NI5531_and_NI5534RX")
-                        overrideReceiverSweep.FromLuaTable(receiverSettingsTable, item.ToString());
+                    var overrideVectorSweepSetting = new OverrideVectorSweepSetting();
+                    if (item.ToString() == "sweep_vector_overridePowerAsArray")
+                        overrideVectorSweepSetting.FromLuaTable(vectorSettingsTable, item.ToString());
                 }
             }
 

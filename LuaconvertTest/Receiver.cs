@@ -103,25 +103,14 @@ namespace LuaconvertTest
             {
                 var receiverSweepSettingPoint = ReceiverSweepSettingPoints[i];
 
-                receiverSweepSettingPoint.RFSARerenceLevel = Utilities.HasField(point, "RFSAReferenceLevel") ? Utilities.MutiDoubleFromFile(point, "RFSAReferenceLevel") :
-                                                                                                           i > 0 ? lastReceiverSweepSettingPoint.RFSARerenceLevel :
-                                                                                                           default;
-                receiverSweepSettingPoint.PortPower = Utilities.HasField(point, "portPower") ? Utilities.MutiDoubleFromFile(point, "portPower") :
-                                                                                               i > 0 ? lastReceiverSweepSettingPoint.PortPower 
-                                                                                               : default;
-                receiverSweepSettingPoint.ComplingPath_5530 = Utilities.HasField(point, "5530_CouplingPath") ? Utilities.MutiStringFromFile(point, "5530_CouplingPath") :
-                                                                                                       i > 0 ? lastReceiverSweepSettingPoint.ComplingPath_5530 : 
-                                                                                                       default;
-                receiverSweepSettingPoint.RXPath_5530 = Utilities.HasField(point, "5530_RXPath") ? Utilities.MutiStringFromFile(point, "5530_RXPath") :
-                                                                                           i > 0 ? lastReceiverSweepSettingPoint.RXPath_5530 :
-                                                                                           default;
-                receiverSweepSettingPoint.TXPath_5530 = Utilities.HasField(point, "5530_TXPath") ? Utilities.MutiStringFromFile(point, "5530_TXPath") :
-                                                                                           i > 0 ? lastReceiverSweepSettingPoint.TXPath_5530 :
-                                                                                           default;
-                receiverSweepSettingPoint.calibrationSettings = Utilities.HasField(point, "calibrationSettings") ? GetCalibrationSettings((LuaTable)point["calibrationSettings"]) :
-                                                                                           i > 0 ? lastReceiverSweepSettingPoint.calibrationSettings.Clone() : 
-                                                                                           default;
-                
+                receiverSweepSettingPoint.RFSARerenceLevel = Utilities.HasField(point, "RFSAReferenceLevel") ? Utilities.MutiDoubleFromFile(point, "RFSAReferenceLevel") : i > 0 ? lastReceiverSweepSettingPoint.RFSARerenceLevel : default;
+                receiverSweepSettingPoint.PortPower = Utilities.HasField(point, "portPower") ? Utilities.MutiDoubleFromFile(point, "portPower") : i > 0 ? lastReceiverSweepSettingPoint.PortPower : default;
+                receiverSweepSettingPoint.ComplingPath_5530 = Utilities.HasField(point, "5530_CouplingPath") ? Utilities.MutiStringFromFile(point, "5530_CouplingPath") : i > 0 ? lastReceiverSweepSettingPoint.ComplingPath_5530 : default;
+                receiverSweepSettingPoint.RXPath_5530 = Utilities.HasField(point, "5530_RXPath") ? Utilities.MutiStringFromFile(point, "5530_RXPath") : i > 0 ? lastReceiverSweepSettingPoint.RXPath_5530 : default;
+                receiverSweepSettingPoint.TXPath_5530 = Utilities.HasField(point, "5530_TXPath") ? Utilities.MutiStringFromFile(point, "5530_TXPath") : i > 0 ? lastReceiverSweepSettingPoint.TXPath_5530 : default;
+                receiverSweepSettingPoint.calibrationSettings = Utilities.HasField(point, "calibrationSettings") ? GetCalibrationSettings((LuaTable)point["calibrationSettings"]) :  i > 0 ? lastReceiverSweepSettingPoint.calibrationSettings.Clone() : default;
+
+                ReceiverSweepSettingPoints[i] = receiverSweepSettingPoint;
                 lastReceiverSweepSettingPoint = receiverSweepSettingPoint;
                 i++;
             }
@@ -139,6 +128,4 @@ namespace LuaconvertTest
             };
         }
     }
-
-
 }

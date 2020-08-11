@@ -11,6 +11,10 @@ namespace LuaconvertTest
         public List<double> vectorCal_Power_powerMeter { get; set; } = new List<double>();
         public List<double> vectorCal_Power { get; set; } = new List<double>();
         public List<double> scalarCal_Power_sourceCal { get; set; } = new List<double>();
+        public virtual VectorCalibrationElements Clone()
+        {
+            return this.MemberwiseClone() as VectorCalibrationElements;
+        }
     }
     /*
      * 这个类是Vector模式下的simple里一个频率点的数据结构。
@@ -60,50 +64,34 @@ namespace LuaconvertTest
                     vectorSweepSettingPoint.PortPower = lastVectorSweepSettingPoint.PortPower;
                     vectorSweepSettingPoint.IFBW = lastVectorSweepSettingPoint.IFBW;
                     vectorSweepSettingPoint.ReferenceLevel = lastVectorSweepSettingPoint.ReferenceLevel;
-                    vectorSweepSettingPoint.calibrationSettings.IFBW = lastVectorSweepSettingPoint.calibrationSettings.IFBW;
-                    vectorSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal = lastVectorSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal;
-                    vectorSweepSettingPoint.calibrationSettings.vectorCal_Power = lastVectorSweepSettingPoint.calibrationSettings.vectorCal_Power;
-                    vectorSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = lastVectorSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter;
+                    vectorSweepSettingPoint.calibrationSettings = lastVectorSweepSettingPoint.calibrationSettings;
                     vectorSweepSettingPoint.RFSARerenceLevel = lastVectorSweepSettingPoint.RFSARerenceLevel;
                     vectorSweepSettingPoint.TXPath_5530 = lastVectorSweepSettingPoint.TXPath_5530;
                     vectorSweepSettingPoint.RXPath_5530 = lastVectorSweepSettingPoint.RXPath_5530;
                 }
-                foreach (var item in point.Keys)
-                {
-                    if (item.ToString() == "portPower")
-                        vectorSweepSettingPoint.PortPower = Utilities.MutiDoubleFromFile(point, item.ToString());
-                    else if (item.ToString() == "freq")
-                        vectorSweepSettingPoint.Frequency = double.Parse(point[item].ToString());
-                    else if (item.ToString() == "referenceLevel")
-                        vectorSweepSettingPoint.ReferenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
-                    else if (item.ToString() == "IFBW")
-                        vectorSweepSettingPoint.IFBW = double.Parse(point[item].ToString());
-                    else if (item.ToString() == "calibrationSettings")
-                    {
-                        LuaTable calibrationTable = (LuaTable)point["calibrationSettings"];
-                        foreach (var subpoint in calibrationTable.Keys)
-                        {
-                            if (subpoint.ToString() == "IFBW")
-                                vectorSweepSettingPoint.calibrationSettings.IFBW = double.Parse(calibrationTable[subpoint].ToString());
-                            else if (subpoint.ToString() == "vectorCal_Power")
-                                vectorSweepSettingPoint.calibrationSettings.vectorCal_Power = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
-                            else if (subpoint.ToString() == "vectorCal_Power_powerMeter")
-                                vectorSweepSettingPoint.calibrationSettings.vectorCal_Power_powerMeter = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
-                            else if (subpoint.ToString() == "scalarCal_Power_sourceCal")
-                                vectorSweepSettingPoint.calibrationSettings.scalarCal_Power_sourceCal = Utilities.MutiDoubleFromFile(calibrationTable, subpoint.ToString());
-                        }
-                    }
-                    else if (item.ToString() == "RFSAReferenceLevel")
-                        vectorSweepSettingPoint.RFSARerenceLevel = Utilities.MutiDoubleFromFile(point, item.ToString());
-                    else if (item.ToString() == "5530_TXPath")
-                        vectorSweepSettingPoint.TXPath_5530 = Utilities.MutiStringFromFile(point, item.ToString());
-                    else if (item.ToString() == "5530_RXPath")
-                        vectorSweepSettingPoint.RXPath_5530 = Utilities.MutiStringFromFile(point, item.ToString());
-                }
+                vectorSweepSettingPoint.Frequency = Utilities.HasField(point, "freq") ? double.Parse(point["freq"].ToString()) : i > 0 ? lastVectorSweepSettingPoint.Frequency : default;
+                vectorSweepSettingPoint.IFBW = Utilities.HasField(point, "IFBW") ? double.Parse(point["IFBW"].ToString()) : i > 0 ? lastVectorSweepSettingPoint.IFBW : default;
+                vectorSweepSettingPoint.PortPower = Utilities.HasField(point, "portPower") ? Utilities.MutiDoubleFromFile(point, "portPower") : i > 0 ? lastVectorSweepSettingPoint.PortPower : default;
+                vectorSweepSettingPoint.ReferenceLevel = Utilities.HasField(point, "referenceLevel") ? Utilities.MutiDoubleFromFile(point, "referenceLevel") : i > 0 ? lastVectorSweepSettingPoint.ReferenceLevel : default;
+                vectorSweepSettingPoint.RFSARerenceLevel = Utilities.HasField(point, "RFSAReferenceLevel") ? Utilities.MutiDoubleFromFile(point, "RFSAReferenceLevel") : i > 0 ? lastVectorSweepSettingPoint.RFSARerenceLevel : default;
+                vectorSweepSettingPoint.TXPath_5530 = Utilities.HasField(point, "5530_TXPath") ? Utilities.MutiStringFromFile(point, "5530_TXPath") : i > 0 ? lastVectorSweepSettingPoint.TXPath_5530 : default;
+                vectorSweepSettingPoint.RXPath_5530 = Utilities.HasField(point, "5530_RXPath") ? Utilities.MutiStringFromFile(point, "5530_RXPath") : i > 0 ? lastVectorSweepSettingPoint.RXPath_5530 : default;
+                vectorSweepSettingPoint.calibrationSettings = Utilities.HasField(point, "calibrationSettings") ? GetCalibrationSettings((LuaTable)point["calibrationSettings"]) : i > 0 ? lastVectorSweepSettingPoint.calibrationSettings.Clone() : default;
+
                 VectorSweepSettingPoints.Add(vectorSweepSettingPoint);
                 lastVectorSweepSettingPoint = vectorSweepSettingPoint;
                 i++;
             }
+        }
+        private VectorCalibrationElements GetCalibrationSettings(LuaTable luaTable)
+        {
+            return new VectorCalibrationElements()
+            {
+                IFBW = Utilities.HasField(luaTable, "IFBW") ? double.Parse(luaTable["IFBW"].ToString()) : default,
+                vectorCal_Power = Utilities.HasField(luaTable, "vectorCal_Power") ? Utilities.MutiDoubleFromFile(luaTable, "vectorCal_Power") : default,
+                vectorCal_Power_powerMeter = Utilities.HasField(luaTable, "vectorCal_Power_powerMeter") ? Utilities.MutiDoubleFromFile(luaTable, "vectorCal_Power_powerMeter") : default,
+                scalarCal_Power_sourceCal = Utilities.HasField(luaTable, "scalarCal_Power_sourceCal") ? Utilities.MutiDoubleFromFile(luaTable, "scalarCal_Power_sourceCal") : default,
+            };
         }
     }
     /*
